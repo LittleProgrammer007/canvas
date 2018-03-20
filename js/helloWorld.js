@@ -12,15 +12,17 @@ window.onload = function () {
 function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext("2d");
-    const widgets = [];
+    let widgets = [];
     let animationId = null;
 
-    function _init() {
-        //设置画布全屏
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+    //设置画布全屏
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-        //设置背景
+    function draw(word) {
+        cancelAnimation();
+
+        //刷新背景
         refreshBackground();
 
         //绘制文字
@@ -36,6 +38,7 @@ function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
         startY = canvas.height * 0.5 - 222;
         const imageData = ctx.getImageData(startX, startY, fontMeasure, 222).data;
         let count = 0;
+        widgets = [];
 
         for (let i = 0; i < imageData.length; i += 4) {
             //根据颜色值判断是否是文字像素点
@@ -77,17 +80,23 @@ function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
             const diffY = diffX = this.radian;
             const x = this.drawX;
             const y = this.drawY;
-            //绘制爱心
+
             ctx.fillStyle = this.color;
+
             ctx.beginPath();
-            ctx.moveTo(x + 0.5 * diffX, y + 0.3 * diffY);
-            ctx.bezierCurveTo(x + 0.1 * diffX, y, x,
-                y + 0.6 * diffY, x + 0.5 *
-                diffX, y + 0.9 * diffY);
-            ctx.bezierCurveTo(x + 1 * diffX, y + 0.6 *
-                diffY, x + 0.9 * diffX, y,
-                x + 0.5 * diffX,
-                y + 0.3 * diffY);
+            //绘制爱心
+            // ctx.moveTo(x + 0.5 * diffX, y + 0.3 * diffY);
+            // ctx.bezierCurveTo(x + 0.1 * diffX, y, x,
+            //     y + 0.6 * diffY, x + 0.5 *
+            //     diffX, y + 0.9 * diffY);
+            // ctx.bezierCurveTo(x + 1 * diffX, y + 0.6 *
+            //     diffY, x + 0.9 * diffX, y,
+            //     x + 0.5 * diffX,
+            //     y + 0.3 * diffY);
+
+            //绘制圆点
+            ctx.arc(x, y, randomInt(5), 0, 2 * Math.PI);
+
             ctx.closePath();
             ctx.fill();
         },
@@ -155,11 +164,23 @@ function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
         window.cancelAnimationFrame(animationId);
     }
 
-    _init();
+    draw(word);
 
     return cancelAnimation;
 }
 
 function randomInt(max = 10) {
     return Math.ceil(Math.random() * max);
+}
+
+function countdown(num){
+    const words = Array.from({length:num},(x,index)=>(num - index)+'');
+
+    words.push('0');
+
+    for(let i=0,len=words.length;i<len;i++){
+        setTimeout(function(){
+            drawWordInCenter('canvas',words[i])
+        },i*1000);
+    }
 }
