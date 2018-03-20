@@ -2,6 +2,13 @@ window.onload = function () {
     window.cancelDrawWord = drawWordInCenter();
 }
 
+/**
+ * 在窗口中央绘制文字
+ * @param {string} canvasId - canvas id 选择器
+ * @param {string} word - 显示的文字
+ * @param {number} step - 取值间隔
+ * @returns 取消文字抖动动画函数
+ */
 function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext("2d");
@@ -9,11 +16,14 @@ function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
     let animationId = null;
 
     function _init() {
+        //设置画布全屏
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
+        //设置背景
         refreshBackground();
 
+        //绘制文字
         ctx.fillStyle = "hsla(0,0%,0%,1)";
         ctx.font = "Bold 12em sans-serif";
         var t = word.split("").join(String.fromCharCode(0x2006));
@@ -21,19 +31,21 @@ function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
         var startX = (canvas.width - fontMeasure) * 0.5;
         var startY = canvas.height * 0.5;
         ctx.fillText(t, startX, startY);
-        startY = canvas.height * 0.5 - 222;
 
+        //得到ImageData
+        startY = canvas.height * 0.5 - 222;
         const imageData = ctx.getImageData(startX, startY, fontMeasure, 222).data;
         let count = 0;
 
         for (let i = 0; i < imageData.length; i += 4) {
+            //根据颜色值判断是否是文字像素点
             if (0 === imageData[i]) {
                 count++;
+                //根据步长，取文字像素点，添加新的小图形
                 if (0 === count % step) {
                     const index = i / 4;
                     const widget = new Widget(startX + index % fontMeasure, startY + Math.floor(index / fontMeasure));
                     widgets.push(widget);
-                    widget.draw();
                 }
             }
         }
@@ -51,7 +63,7 @@ function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
         this.startY = y;
         this.drawX = x;
         this.drawY = y;
-        this.color = 'hsla( ' + Math.random() * 360 + ', 90%, 65%, 1)';
+        this.color = 'hsla( ' + Math.random() * 360 + ', 90%, 65%, 1)';//填充色
         this.degree = 0.05;
         this.maxOffset = randomInt(10);
         this.offsetX = randomInt(8);
@@ -65,7 +77,7 @@ function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
             const diffY = diffX = this.radian;
             const x = this.drawX;
             const y = this.drawY;
-
+            //绘制爱心
             ctx.fillStyle = this.color;
             ctx.beginPath();
             ctx.moveTo(x + 0.5 * diffX, y + 0.3 * diffY);
@@ -87,7 +99,7 @@ function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
             if (this.offsetY > this.maxOffset) {
                 this.offsetY = this.maxOffset;
             }
-
+            //偏移
             this.drawX += this.offsetX * this.degree;
             this.drawY += this.offsetY * this.degree;
 
@@ -101,7 +113,7 @@ function drawWordInCenter(canvasId = 'canvas', word = 'WELCOME', step = 30) {
 
             const startX = this.startX;
             const startY = this.startY;
-
+            //确保在一定范围内移动
             if (x < startX - maxDiff) {
                 this.drawX = startX - maxDiff;
                 this.offsetX *= -1;
